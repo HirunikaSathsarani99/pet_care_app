@@ -1,7 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_care_app/view/style.dart'; // Your style file for color details
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -9,7 +10,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController petNameController = TextEditingController();
@@ -21,6 +21,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _formKey = GlobalKey<FormState>(); // For form validation
 
+  //instance of Auth
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  //instance of cloud firestore
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+
+  //create new user
+  Future<UserCredential> signUpWithEmailAndPassword(
+      String email, String password, String petname) async {
+    try {
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      //create new user in cloud firestore table
+      _firebaseFirestore.collection('users').doc(userCredential.user!.uid).set({
+        'uid': userCredential.user!.uid,
+        'email': userCredential.user!.email,
+        'name': petname,
+      }, SetOptions(merge: true));
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.code);
+    }
+  }
+
   // Function to open date picker
   Future<void> _selectDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
@@ -31,7 +56,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
     if (picked != null) {
       setState(() {
-        birthdateController.text = "${picked.toLocal()}".split(' ')[0]; // Format the date
+        birthdateController.text =
+            "${picked.toLocal()}".split(' ')[0]; // Format the date
       });
     }
   }
@@ -54,17 +80,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[900], // Same dark background
       body: Center(
-        child: SingleChildScrollView( // Allows scrolling for smaller screens
+        child: SingleChildScrollView(
+          // Allows scrolling for smaller screens
           padding: EdgeInsets.all(30), // Padding around the screen content
           child: Form(
             key: _formKey, // Assign the form key
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Align content to the left
               children: [
                 Center(
                   child: Column(
                     children: [
-                      Image.asset('assets/register_image.png'), // Replace with your image asset
+                      Image.asset(
+                          'assets/register_image.png'), // Replace with your image asset
                       SizedBox(height: 20),
                       Text(
                         "Let's get Started",
@@ -79,7 +108,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         "Create your account and manage your pet's profile",
                         style: TextStyle(
                           fontSize: 16, // Informational text
-                          color: Colors.white70, // Slightly transparent white for secondary text
+                          color: Colors
+                              .white70, // Slightly transparent white for secondary text
                         ),
                       ),
                     ],
@@ -152,7 +182,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Pet Image Picker Field
                 GestureDetector(
                   onTap: _pickPetImage,
-                  child: AbsorbPointer( // Prevent manual typing
+                  child: AbsorbPointer(
+                    // Prevent manual typing
                     child: _buildTextField(
                       "Pet Image (optional)",
                       Icons.image,
@@ -170,7 +201,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onTap: () {
                     _selectDate(context); // Open the date picker
                   },
-                  child: AbsorbPointer( // Prevent manual typing
+                  child: AbsorbPointer(
+                    // Prevent manual typing
                     child: _buildTextField(
                       "Birthdate",
                       Icons.calendar_today,
@@ -223,19 +255,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // All inputs are valid
-                        print("Account created");
-                          Navigator.pushNamed(context, '/login'); 
-                      }
+                      signUpWithEmailAndPassword(emailController.text,
+                              passwordController.text, petNameController.text)
+                          .then((userCredentials) => {
+                                if (userCredentials.user!.uid.isNotEmpty)
+                                  {Navigator.pushNamed(context, '/login')}
+                              });
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ThemeColor, // Orange color from style file
-                      padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
+                    // onPressed: () {
+
+                    //   if (_formKey.currentState!.validate()) {
+                    //     // All inputs are valid
+                    //     print("Account created");
+                    //     Navigator.pushNamed(context, '/login');
+                    //   }
+                    // },
+                    // style: ElevatedButton.styleFrom(
+                    //   backgroundColor:
+                    //       AppColors.ThemeColor, // Orange color from style file
+                    //   padding:
+                    //       EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                    //   shape: RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(30),
+                    //   ),
+                    // ),
                     child: Text(
                       'Create Account',
                       style: TextStyle(
@@ -263,12 +306,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
-                           Navigator.pushNamed(context, '/login'); // Navigate to login screen
+                          Navigator.pushNamed(
+                              context, '/login'); // Navigate to login screen
                         },
                         child: Text(
                           "Login here",
                           style: TextStyle(
-                            color: AppColors.ThemeColor, // Orange text for Login
+                            color:
+                                AppColors.ThemeColor, // Orange text for Login
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -298,17 +343,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10), // Space between fields
       child: Container(
-         decoration: BoxDecoration(
-        color: Colors.grey[850], 
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2), 
-            blurRadius: 10, 
-            offset: Offset(0, 5), 
-          ),
-        ],
-      ),
+        decoration: BoxDecoration(
+          color: Colors.grey[850],
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
         child: TextFormField(
           controller: controller,
           obscureText: isObscure, // If the field is for password, hide text
@@ -323,7 +368,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(color: AppColors.ThemeColor), // Focused color
+              borderSide:
+                  BorderSide(color: AppColors.ThemeColor), // Focused color
             ),
           ),
           style: TextStyle(color: Colors.white), // Text field input color
