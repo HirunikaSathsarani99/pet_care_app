@@ -14,7 +14,11 @@ class TemperatureHumidityPage extends StatelessWidget {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+
+          
           children: [
+              Image.asset('assets/temp.png', height: 300),
+            SizedBox(height: 30),
             _buildInfoBox(Icons.thermostat, 'Temperature', '25°C'),
             SizedBox(height: 20),
             _buildInfoBox(Icons.water, 'Humidity', '60%'),
