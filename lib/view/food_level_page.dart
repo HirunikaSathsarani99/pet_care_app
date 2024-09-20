@@ -8,8 +8,8 @@ class FoodLevelPage extends StatefulWidget {
 
 class _FoodLevelPageState extends State<FoodLevelPage>
     with SingleTickerProviderStateMixin {
-  double foodLevel = 75; // Hardcoded food level percentage
-  double waterLevel = 50; // Hardcoded water level percentage
+  double foodLevel = 75; 
+  double waterLevel = 50; 
   late AnimationController _controller;
   late Animation<double> _foodAnimation;
   late Animation<double> _waterAnimation;
@@ -60,10 +60,9 @@ class _FoodLevelPageState extends State<FoodLevelPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Food and Water Levels',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
+          
+             
+            Center(child: Image.asset('assets/food.png', height: 300)),
             SizedBox(height: 30),
             AnimatedBuilder(
               animation: _foodAnimation,
@@ -72,7 +71,7 @@ class _FoodLevelPageState extends State<FoodLevelPage>
                     '${_foodAnimation.value.toStringAsFixed(0)}%');
               },
             ),
-            SizedBox(height: 20), // Space between the boxes
+            SizedBox(height: 20), 
             AnimatedBuilder(
               animation: _waterAnimation,
               builder: (context, child) {

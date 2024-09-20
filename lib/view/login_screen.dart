@@ -23,17 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Form(
             key: _formKey, // Assign the form key
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+              crossAxisAlignment: CrossAxisAlignment.start, 
               children: [
                 Center(
                   child: Column(
                     children: [
-                      Image.asset('assets/login_image.png'), // Same image as in Register Screen
+                      Image.asset('assets/login_image.png'), 
                       SizedBox(height: 15),
                       Text(
                         "Let's get Started",
                         style: TextStyle(
-                          fontSize: 28, // Large heading text
+                          fontSize: 28, 
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -42,14 +42,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         "Login to your account and manage your pet's profile",
                         style: TextStyle(
-                          fontSize: 16, // Informational text
-                          color: Colors.white70, // Slightly transparent white for secondary text
+                          fontSize: 16, 
+                          color: Colors.white70,
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 30), // Space between header and form
+                SizedBox(height: 30),
 
                 // Email and Password Fields
                 _buildTextField(

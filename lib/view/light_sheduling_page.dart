@@ -25,6 +25,9 @@ class _LightSchedulingPageState extends State<LightSchedulingPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            
+            Center(child: Image.asset('assets/light.png', height: 300)),
+            SizedBox(height: 30),
             Text(
               'Light is currently ${_isLightOn ? 'ON' : 'OFF'}',
               style: TextStyle(fontSize: 24, color: Colors.white),

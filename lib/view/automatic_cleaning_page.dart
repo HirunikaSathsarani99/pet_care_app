@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:pet_care_app/view/style.dart'; // Assuming your style file is here
 
 class AutomaticCleaningPage extends StatefulWidget {
@@ -42,88 +41,73 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
               style: TextStyle(color: Colors.white, fontSize: 22),
             ),
             SizedBox(height: 20),
+            
+            Center(child: Image.asset('assets/cleaning_image.png', height: 300)),
+            SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      cleanLaterSelected = false; 
-                    });
-                    // Handle Clean Now functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:cleanLaterSelected?Colors.grey[600]: AppColors.ThemeColor,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Clean Now',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      cleanLaterSelected = true; // Clean Later selected
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: cleanLaterSelected
-                        ? AppColors.ThemeColor
-                        : Colors.grey[600],
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: Text(
-                    'Clean Later',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
+                _buildActionButton('Clean Now', false),
+                _buildActionButton('Clean Later', true),
               ],
             ),
             SizedBox(height: 30),
-            if (cleanLaterSelected)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Select Time:',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _selectTime(context); // Open time picker
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.ThemeColor,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Text(
-                          selectedTime != null
-                              ? selectedTime!.format(context)
-                              : 'Select Time',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            if (cleanLaterSelected) _buildTimeSelection(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildActionButton(String title, bool isCleanLater) {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          cleanLaterSelected = isCleanLater;
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: cleanLaterSelected == isCleanLater
+            ? AppColors.ThemeColor
+            : Colors.grey[600],
+        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 18, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildTimeSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Select Time:',
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+        SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () {
+            _selectTime(context); // Open time picker
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.ThemeColor,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: Text(
+            selectedTime != null ? selectedTime!.format(context) : 'Select Time',
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }
