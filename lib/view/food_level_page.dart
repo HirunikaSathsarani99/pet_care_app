@@ -9,8 +9,10 @@ class FoodLevelPage extends StatefulWidget {
 class _FoodLevelPageState extends State<FoodLevelPage>
     with SingleTickerProviderStateMixin {
   double foodLevel = 75; // Hardcoded food level percentage
+  double waterLevel = 50; // Hardcoded water level percentage
   late AnimationController _controller;
-  late Animation<double> _animation;
+  late Animation<double> _foodAnimation;
+  late Animation<double> _waterAnimation;
 
   @override
   void initState() {
@@ -20,7 +22,14 @@ class _FoodLevelPageState extends State<FoodLevelPage>
       vsync: this,
     );
 
-    _animation = Tween<double>(begin: 0, end: foodLevel).animate(
+    _foodAnimation = Tween<double>(begin: 0, end: foodLevel).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _waterAnimation = Tween<double>(begin: 0, end: waterLevel).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
@@ -39,27 +48,36 @@ class _FoodLevelPageState extends State<FoodLevelPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Food Level',
+      appBar: AppBar(
+        title: Text('Food and Water Levels'),
+        backgroundColor: AppColors.ThemeColor,
       ),
-      backgroundColor: AppColors.ThemeColor,),
       body: Container(
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.grey[900], 
+          color: Colors.grey[900],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Food Level',
+              'Food and Water Levels',
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
             SizedBox(height: 30),
             AnimatedBuilder(
-              animation: _animation,
+              animation: _foodAnimation,
               builder: (context, child) {
-                return _buildInfoBox(Icons.fastfood, 'Current Level', 
-                  '${_animation.value.toStringAsFixed(0)}%');
+                return _buildInfoBox(Icons.fastfood, 'Food Level',
+                    '${_foodAnimation.value.toStringAsFixed(0)}%');
+              },
+            ),
+            SizedBox(height: 20), // Space between the boxes
+            AnimatedBuilder(
+              animation: _waterAnimation,
+              builder: (context, child) {
+                return _buildInfoBox(Icons.local_drink, 'Water Level',
+                    '${_waterAnimation.value.toStringAsFixed(0)}%');
               },
             ),
           ],
