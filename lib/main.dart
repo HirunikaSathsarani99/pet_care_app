@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_care_app/view/login_screen.dart';
 import 'package:pet_care_app/view/registration_screen.dart';
 import 'package:pet_care_app/view/spalsh_screen.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       home:  SplashScreen(),
        routes: {
       '/register': (context) => RegisterScreen(), 
+      '/login': (context) => LoginScreen(), 
     },
     );
   }

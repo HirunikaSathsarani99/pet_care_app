@@ -1,60 +1,24 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_care_app/view/style.dart'; // Your style file for color details
 
-
-class RegisterScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
-
+class _LoginScreenState extends State<LoginScreen> {
+  // Controllers for email and password fields
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController petNameController = TextEditingController();
-  TextEditingController birthdateController = TextEditingController();
-  TextEditingController heightController = TextEditingController();
-  TextEditingController weightController = TextEditingController();
-
-  String? petImagePath; // For storing pet image path
 
   final _formKey = GlobalKey<FormState>(); // For form validation
-
-  // Function to open date picker
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        birthdateController.text = "${picked.toLocal()}".split(' ')[0]; // Format the date
-      });
-    }
-  }
-
-  // Function to open file picker for pet image
-  Future<void> _pickPetImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
-
-    if (result != null) {
-      setState(() {
-        petImagePath = result.files.single.path; // Save file path
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Same dark background
+      backgroundColor: Colors.grey[900], // Same dark background as in Register Screen
       body: Center(
-        child: SingleChildScrollView( // Allows scrolling for smaller screens
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(30), // Padding around the screen content
           child: Form(
             key: _formKey, // Assign the form key
@@ -64,8 +28,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Image.asset('assets/register_image.png'), // Replace with your image asset
-                      SizedBox(height: 20),
+                      Image.asset('assets/login_image.png'), // Same image as in Register Screen
+                      SizedBox(height: 15),
                       Text(
                         "Let's get Started",
                         style: TextStyle(
@@ -76,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "Create your account and manage your pet's profile",
+                        "Login to your account and manage your pet's profile",
                         style: TextStyle(
                           fontSize: 16, // Informational text
                           color: Colors.white70, // Slightly transparent white for secondary text
@@ -116,116 +80,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return "Password is required";
                     }
-                    if (value.length < 5) {
-                      return "Password must be a maximum of 5 characters";
-                    }
-                    return null;
-                  },
-                ),
-
-                SizedBox(height: 20), // Space before Pet Info section
-                Text(
-                  "Pet Info",
-                  style: TextStyle(
-                    fontSize: 18, // Section heading text
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                // Pet Name, Pet Image, Birthdate, Height, Weight Fields
-                _buildTextField(
-                  "Pet Name",
-                  Icons.pets,
-                  petNameController,
-                  false,
-                  TextInputType.text,
-                  false,
-                  (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Pet Name is required";
-                    }
-                    return null;
-                  },
-                ),
-
-                // Pet Image Picker Field
-                GestureDetector(
-                  onTap: _pickPetImage,
-                  child: AbsorbPointer( // Prevent manual typing
-                    child: _buildTextField(
-                      "Pet Image (optional)",
-                      Icons.image,
-                      TextEditingController(text: petImagePath ?? ""),
-                      false,
-                      TextInputType.text,
-                      false,
-                      null,
-                    ),
-                  ),
-                ),
-
-                // Birthdate Field - Opens a date picker
-                GestureDetector(
-                  onTap: () {
-                    _selectDate(context); // Open the date picker
-                  },
-                  child: AbsorbPointer( // Prevent manual typing
-                    child: _buildTextField(
-                      "Birthdate",
-                      Icons.calendar_today,
-                      birthdateController,
-                      false,
-                      TextInputType.datetime,
-                      false,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Birthdate is required";
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-
-                _buildTextField(
-                  "Height (cm)",
-                  Icons.height,
-                  heightController,
-                  false,
-                  TextInputType.number,
-                  false,
-                  (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Height is required";
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  "Weight (kg)",
-                  Icons.fitness_center,
-                  weightController,
-                  false,
-                  TextInputType.number,
-                  false,
-                  (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Weight is required";
-                    }
                     return null;
                   },
                 ),
 
                 SizedBox(height: 30), // Space before button
 
-                // Create Account Button
+                // Login Button
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // All inputs are valid
-                        print("Account created");
+                        print("Logged in");
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -236,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     child: Text(
-                      'Create Account',
+                      'Login',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -245,29 +112,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                SizedBox(height: 20), // Space before login text
+                SizedBox(height: 20), // Space before register text
 
-                // Already have an account? Login here
+                // You haven't an account? Register here
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already have an account?",
+                        "You haven't an account?",
                         style: TextStyle(
-                          color: Colors.white70, // Secondary text color
+                          color: Colors.white70, 
                           fontSize: 16,
                         ),
                       ),
                       SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
-                           Navigator.pushNamed(context, '/login'); // Navigate to login screen
+                          Navigator.pushNamed(context, '/register'); // Navigate to register screen
                         },
                         child: Text(
-                          "Login here",
+                          "Register",
                           style: TextStyle(
-                            color: AppColors.ThemeColor, // Orange text for Login
+                            color: AppColors.ThemeColor, // Orange text for Register
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
