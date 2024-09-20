@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_care_app/view/style.dart'; // Your style file for color details
-
+import 'package:pet_care_app/view/style.dart'; 
 class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class SplashScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.max, 
               children: [
                 Spacer() ,
-                Text(
+                const Text(
                   "Smart Pet House",
                   style: TextStyle(
                     fontSize: 30,
@@ -35,13 +34,13 @@ class SplashScreen extends StatelessWidget {
                     color: Colors.white, 
                   ),
                 ),
-               Spacer() ,// Space between text and image
+               Spacer() ,
                 Image.asset('assets/splash_image.png'),
-                Spacer(), // Add your image asset here
+                Spacer(), 
                
                 ElevatedButton(
                   onPressed: () {
-                     Navigator.pushNamed(context, '/register'); // Navigate to login screen
+                     Navigator.pushNamed(context, '/register');
                     
                     
                   },
@@ -49,15 +48,15 @@ class SplashScreen extends StatelessWidget {
                     backgroundColor: AppColors.ThemeColor, 
                     padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15), 
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // Rounded button corners
+                      borderRadius: BorderRadius.circular(30), 
                     ),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
                       Text(
                         'Get Started',
                         style: TextStyle(
-                          color: Colors.white, // Button text color
+                          color: Colors.white, 
                           fontSize: 18, // Button text size
                         ),
                       ),
