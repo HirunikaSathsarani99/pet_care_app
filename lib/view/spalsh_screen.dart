@@ -41,6 +41,8 @@ class SplashScreen extends StatelessWidget {
                
                 ElevatedButton(
                   onPressed: () {
+                     Navigator.pushNamed(context, '/register'); // Navigate to login screen
+                    
                     
                   },
                   style: ElevatedButton.styleFrom(

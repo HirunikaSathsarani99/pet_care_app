@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_care_app/view/registration_screen.dart';
 import 'package:pet_care_app/view/spalsh_screen.dart';
 
 void main() {
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home:  SplashScreen(),
+       routes: {
+      '/register': (context) => RegisterScreen(), 
+    },
     );
   }
 }
