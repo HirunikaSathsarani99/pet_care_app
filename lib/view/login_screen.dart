@@ -93,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (_formKey.currentState!.validate()) {
                         // All inputs are valid
                         print("Logged in");
+                         Navigator.pushNamed(context, '/home'); 
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -162,26 +163,39 @@ class _LoginScreenState extends State<LoginScreen> {
     String? Function(String?)? validator,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10), // Space between fields
-      child: TextFormField(
-        controller: controller,
-        obscureText: isObscure, // If the field is for password, hide text
-        keyboardType: keyboardType, // Set the keyboard type
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: Colors.white70), // Label text color
-          prefixIcon: Icon(icon, color: Colors.white70), // Icon color
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide(color: Colors.white70),
+      padding: const EdgeInsets.symmetric(vertical: 10), 
+      child: Container(
+         decoration: BoxDecoration(
+        color: Colors.grey[850], 
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2), 
+            blurRadius: 10, 
+            offset: Offset(0, 5), 
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide(color: AppColors.ThemeColor), // Focused color
+        ],
+      ),
+        child: TextFormField(
+          controller: controller,
+          obscureText: isObscure, 
+          keyboardType: keyboardType, 
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(color: Colors.white70),
+            prefixIcon: Icon(icon, color: Colors.white70), 
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: Colors.white70),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: AppColors.ThemeColor),
+            ),
           ),
+          style: TextStyle(color: Colors.white), 
+          validator: validator, 
         ),
-        style: TextStyle(color: Colors.white), // Text field input color
-        validator: validator, // Validation function
       ),
     );
   }
