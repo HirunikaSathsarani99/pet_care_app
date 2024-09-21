@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "439130516692",
+    "project_id": "pet-home-app-bc6e3",
+    "storage_bucket": "pet-home-app-bc6e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439130516692:android:6956e9539d8e438b379f41",
+        "android_client_info": {
+          "package_name": "com.example.pet_care_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn-9095Ja5UIFJJMybrb4f2gbP6ruhU0U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
