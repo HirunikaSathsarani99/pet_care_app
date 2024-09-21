@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_care_app/model/user_model.dart';
 import 'package:pet_care_app/view/style.dart';
-import 'package:pet_care_app/view_model/auth_services.dart'; // Your style file for color details
+import 'package:pet_care_app/view_model/auth_services.dart'; 
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -22,7 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isLoading = false;
 
-  String? petImagePath; // For storing pet image path
+  String? petImagePath; 
+  String? petImageUrl;
 
   final _formKey = GlobalKey<FormState>(); // For form validation
 
@@ -42,18 +45,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Function to open file picker for pet image
   Future<void> _pickPetImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
+  FilePickerResult? result = await FilePicker.platform.pickFiles(
+    type: FileType.image,
+  );
 
-    if (result != null) {
+  if (result != null) {
+    File file = File(result.files.single.path!); // Get the selected file
+
+    try {
+      // Create a unique file name using the current timestamp
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      
+      // Upload the file to Firebase Storage
+      TaskSnapshot snapshot = await FirebaseStorage.instance
+          .ref('pet_images/$fileName') // Specify the storage path
+          .putFile(file);
+
+      // Get the download URL of the uploaded image
+      String downloadUrl = await snapshot.ref.getDownloadURL();
+
       setState(() {
-        petImagePath = result.files.single.path; // Save file path
+        petImagePath = result.files.single.path; 
+        petImageUrl = downloadUrl; 
       });
+    } catch (e) {
+     
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image upload failed: $e')),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -249,16 +272,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         scheduleTime: " ",
                       );
 
+                        DateTime selectedDate = DateTime.parse(birthdateController.text);
                       PetInfo petInfo = PetInfo(
                           petName: petNameController.text,
-                          imageUrl: "petImageUrl",
+                          imageUrl: petImageUrl.toString(),
                        
                           weight: weightController.text,
                           height: heightController.text,
                           lightSchedule: lightSchedule,
                           automaticCleaning: automaticCleaning,
                           temperature: 0.0,
-                          humidity: 0.0);
+                          humidity: 0.0,
+                          birthdate: selectedDate);
 
                       User? user =
                           await _authService.registerWithEmailAndPassword(

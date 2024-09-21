@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pet_care_app/view/style.dart'; // Assuming your style file is here
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pet_care_app/view/style.dart';
+import 'package:pet_care_app/view_model/pet_provider.dart'; 
+import 'package:provider/provider.dart';
 
 class AutomaticCleaningPage extends StatefulWidget {
   @override
@@ -7,6 +11,18 @@ class AutomaticCleaningPage extends StatefulWidget {
 }
 
 class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
+  String? userId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userId = user.uid; // Get the user ID
+    }
+  }
+
   bool cleanLaterSelected = false;
   TimeOfDay? selectedTime;
 
@@ -16,10 +32,58 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null && picked != selectedTime) {
+    if (picked != null) {
       setState(() {
         selectedTime = picked;
       });
+    }
+  }
+
+  void _handleCleaningAction(bool isCleanNow) {
+    if (isCleanNow) {
+      // Update database for immediate cleaning
+      _setCleanNow();
+    } else {
+      // Open time picker for scheduled cleaning
+      _selectTime(context);
+    }
+  }
+
+  Future<void> _setCleanNow() async {
+    final petProvider = Provider.of<PetProvider>(context, listen: false);
+    if (userId != null) {
+      await petProvider.setCleanNow(userId!);
+      Fluttertoast.showToast(
+        msg: "Automatic cleaning enabled now.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _saveScheduledTime() async {
+    final petProvider = Provider.of<PetProvider>(context, listen: false);
+    
+    if (selectedTime != null) {
+      String scheduleTime = selectedTime!.format(context);
+      await petProvider.setCleanLater(userId!, scheduleTime);
+      Fluttertoast.showToast(
+        msg: "Scheduled cleaning time saved: $scheduleTime",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Please select a time first.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -41,14 +105,13 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
               style: TextStyle(color: Colors.white, fontSize: 22),
             ),
             SizedBox(height: 20),
-            
             Center(child: Image.asset('assets/cleaning_image.png', height: 300)),
             SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildActionButton('Clean Now', false),
-                _buildActionButton('Clean Later', true),
+                _buildActionButton('Clean Now', true),
+                _buildActionButton('Clean Later', false),
               ],
             ),
             SizedBox(height: 30),
@@ -59,15 +122,18 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
     );
   }
 
-  Widget _buildActionButton(String title, bool isCleanLater) {
+  Widget _buildActionButton(String title, bool isCleanNow) {
     return ElevatedButton(
       onPressed: () {
-        setState(() {
-          cleanLaterSelected = isCleanLater;
-        });
+        _handleCleaningAction(isCleanNow);
+        if (!isCleanNow) {
+          setState(() {
+            cleanLaterSelected = true; // Only allow selecting time if "Clean Later" is clicked
+          });
+        }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: cleanLaterSelected == isCleanLater
+        backgroundColor: cleanLaterSelected == !isCleanNow
             ? AppColors.ThemeColor
             : Colors.grey[600],
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
@@ -91,21 +157,40 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
           style: TextStyle(color: Colors.white, fontSize: 18),
         ),
         SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () {
-            _selectTime(context); // Open time picker
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.ThemeColor,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _selectTime(context); // Open time picker
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.ThemeColor,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text(
+                selectedTime != null ? selectedTime!.format(context) : 'Select Time',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
             ),
-          ),
-          child: Text(
-            selectedTime != null ? selectedTime!.format(context) : 'Select Time',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
+            SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _saveScheduledTime,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.ThemeColor,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text(
+                'Save Time',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
+          ],
         ),
       ],
     );

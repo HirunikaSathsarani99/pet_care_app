@@ -53,6 +53,39 @@ class AuthService {
       return null;
     }
   }
+
+
+  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  print("Login function called");
+
+  try {
+    // Sign in the user with email and password
+    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    // User is successfully logged in
+    print("User logged in: ${userCredential.user?.email}");
+    print("User ID: ${userCredential.user?.uid}");
+    
+    return userCredential.user;
+
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      print('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      print('Wrong password provided for that user.');
+    } else {
+      print("Error in login: ${e.message}");
+    }
+    return null;
+  } catch (e) {
+    print("Error in login: ${e.toString()}");
+    return null;
+  }
+}
+
 }
 
   

@@ -8,6 +8,11 @@ import 'package:pet_care_app/view/login_screen.dart';
 import 'package:pet_care_app/view/registration_screen.dart';
 import 'package:pet_care_app/view/spalsh_screen.dart';
 import 'package:pet_care_app/view/temperature_screen.dart';
+import 'package:pet_care_app/view_model/pet_provider.dart';
+import 'package:pet_care_app/view_model/user_provider.dart';
+
+import 'package:provider/provider.dart'; 
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +25,16 @@ Future<void> main() async {
     )
     
   );
-  runApp(const MyApp());
+ runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PetProvider()), 
+         ChangeNotifierProvider(create: (context) => UserProvider()), 
+   
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
