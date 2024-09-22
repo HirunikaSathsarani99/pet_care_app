@@ -66,7 +66,7 @@ class PetInfo {
 
 class LightSchedule {
   final bool scheduleNowEnabled;
-  final String scheduleTime;
+  final int scheduleTime; // int type for storing time as integer (1-24)
 
   LightSchedule({
     required this.scheduleNowEnabled,
@@ -76,7 +76,7 @@ class LightSchedule {
   factory LightSchedule.fromMap(Map<dynamic, dynamic> map) {
     return LightSchedule(
       scheduleNowEnabled: map['scheduleNowEnabled'] ?? false,
-      scheduleTime: map['scheduleTime'] ?? '',
+      scheduleTime: map['scheduleTime'] ?? 0, // Default to 0 if no value is present
     );
   }
 
@@ -88,9 +88,10 @@ class LightSchedule {
   }
 }
 
+
 class AutomaticCleaning {
   final bool scheduleNowEnabled;
-  final String scheduleTime;
+  final int scheduleTime; // Changed from String to int
 
   AutomaticCleaning({
     required this.scheduleNowEnabled,
@@ -100,7 +101,7 @@ class AutomaticCleaning {
   factory AutomaticCleaning.fromMap(Map<dynamic, dynamic> map) {
     return AutomaticCleaning(
       scheduleNowEnabled: map['scheduleNowEnabled'] ?? false,
-      scheduleTime: map['scheduleTime'] ?? '',
+      scheduleTime: (map['scheduleTime'] as num?)?.toInt() ?? 0, // Handle as int
     );
   }
 

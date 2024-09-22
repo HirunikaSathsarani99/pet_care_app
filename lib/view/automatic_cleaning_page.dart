@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pet_care_app/view/style.dart';
-import 'package:pet_care_app/view_model/pet_provider.dart'; 
+import 'package:pet_care_app/view_model/pet_provider.dart';
 import 'package:provider/provider.dart';
 
 class AutomaticCleaningPage extends StatefulWidget {
@@ -65,12 +65,12 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
 
   Future<void> _saveScheduledTime() async {
     final petProvider = Provider.of<PetProvider>(context, listen: false);
-    
+
     if (selectedTime != null) {
-      String scheduleTime = selectedTime!.format(context);
-      await petProvider.setCleanLater(userId!, scheduleTime);
+      int scheduleHour = selectedTime!.hour; // Save only the hour
+      await petProvider.setCleanLater(userId!, scheduleHour);
       Fluttertoast.showToast(
-        msg: "Scheduled cleaning time saved: $scheduleTime",
+        msg: "Scheduled cleaning time saved: $scheduleHour:00",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.green,
@@ -171,7 +171,7 @@ class _AutomaticCleaningPageState extends State<AutomaticCleaningPage> {
                 ),
               ),
               child: Text(
-                selectedTime != null ? selectedTime!.format(context) : 'Select Time',
+                selectedTime != null ? '${selectedTime!.hour}:00' : 'Select Time',
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),

@@ -264,12 +264,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       // Create LightSchedule and AutomaticCleaning objects
                       LightSchedule lightSchedule = LightSchedule(
                         scheduleNowEnabled: false,
-                        scheduleTime: " ",
+                        scheduleTime: 0,
                       );
 
                       AutomaticCleaning automaticCleaning = AutomaticCleaning(
                         scheduleNowEnabled: false,
-                        scheduleTime: " ",
+                        scheduleTime: 0,
                       );
 
                         DateTime selectedDate = DateTime.parse(birthdateController.text);

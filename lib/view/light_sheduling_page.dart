@@ -160,16 +160,17 @@ class _LightSchedulingPageState extends State<LightSchedulingPage> {
 
   Future<void> _saveScheduledTime() async {
     if (selectedTime != null) {
-      String scheduleTime = selectedTime!.format(context);
+      // Convert selectedTime to an integer hour
+      int scheduleHour = selectedTime!.hour;
       
       final petProvider = Provider.of<PetProvider>(context, listen: false);
       await petProvider.scheduleLight(
         userId: userId.toString(),
-        scheduleTime: scheduleTime,
+        scheduleTime: scheduleHour, // Pass the hour as an int
         scheduleNowEnabled: false,
       );
       Fluttertoast.showToast(
-        msg: "Scheduled light time saved: $scheduleTime",
+        msg: "Scheduled light time saved: $scheduleHour hours",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.green,

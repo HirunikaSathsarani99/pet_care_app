@@ -38,7 +38,7 @@ Future<void> setCleanNow(String userId) async {
       final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/automaticCleaning');
       await ref.set({
         'scheduleNowEnabled': true,
-        'scheduleTime': '', // No schedule time for immediate cleaning
+        'scheduleTime': 0, 
       });
       notifyListeners(); // Notify listeners if necessary
     } catch (e) {
@@ -46,25 +46,25 @@ Future<void> setCleanNow(String userId) async {
     }
   }
 
-  Future<void> setCleanLater(String userId, String scheduleTime) async {
-    if (userId == null) return; // Ensure userId is set
+Future<void> setCleanLater(String userId, int scheduleTime) async {
+  if (userId == null) return; // Ensure userId is set
 
-    try {
-      final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/automaticCleaning');
-      await ref.set({
-        'scheduleNowEnabled': false,
-        'scheduleTime': scheduleTime,
-      });
-      notifyListeners(); // Notify listeners if necessary
-    } catch (e) {
-      print('Error updating automatic cleaning: $e');
-    }
+  try {
+    final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/automaticCleaning');
+    await ref.set({
+      'scheduleNowEnabled': false,
+      'scheduleTime': scheduleTime, // Save hour as int
+    });
+    notifyListeners(); // Notify listeners if necessary
+  } catch (e) {
+    print('Error updating automatic cleaning: $e');
   }
+}
 
 
 //Light set
 
-   Future<void> setLightStatus(bool status, String userId) async {
+  Future<void> setLightStatus(bool status, String userId) async {
     try {
       final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/lightSchedule');
       await ref.set({
@@ -77,19 +77,19 @@ Future<void> setCleanNow(String userId) async {
   }
 
   Future<void> scheduleLight({
-    required String userId,
-    required String scheduleTime,
-    required bool scheduleNowEnabled,
-  }) async {
-    try {
-      final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/lightSchedule');
-      await ref.set({
-        'scheduleNowEnabled': scheduleNowEnabled,
-        'scheduleTime': scheduleTime,
-      });
-      notifyListeners();
-    } catch (e) {
-      print('Error scheduling light: $e');
-    }
+  required String userId,
+  required int scheduleTime, // Accepting int for scheduleTime
+  required bool scheduleNowEnabled,
+}) async {
+  try {
+    final DatabaseReference ref = FirebaseDatabase.instance.ref('Users/$userId/petInfo/lightSchedule');
+    await ref.set({
+      'scheduleNowEnabled': scheduleNowEnabled,
+      'scheduleTime': scheduleTime, // Storing scheduleTime as an int
+    });
+    notifyListeners();
+  } catch (e) {
+    print('Error scheduling light: $e');
   }
+}
 }
