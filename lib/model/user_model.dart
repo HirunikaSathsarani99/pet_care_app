@@ -20,6 +20,7 @@ class PetInfo {
   final double temperature;
   final double humidity;
   final DateTime birthdate;
+  final int foodScope;  
 
   PetInfo({
     required this.petName,
@@ -31,6 +32,7 @@ class PetInfo {
     required this.temperature,
     required this.humidity,
     required this.birthdate,
+    required this.foodScope,  
   });
 
   factory PetInfo.fromMap(Map<dynamic, dynamic> map) {
@@ -43,7 +45,8 @@ class PetInfo {
       automaticCleaning: AutomaticCleaning.fromMap(map['automaticCleaning'] ?? {}),
       temperature: (map['temperature'] as num?)?.toDouble() ?? 0.0,
       humidity: (map['humidity'] as num?)?.toDouble() ?? 0.0,
-      birthdate: DateTime.parse(map['birthdate']), // Parse the birthdate string
+      birthdate: DateTime.parse(map['birthdate']),
+      foodScope: map['foodScoope'] ?? 1,  
     );
   }
 
@@ -57,16 +60,16 @@ class PetInfo {
       'automaticCleaning': automaticCleaning.toMap(),
       'temperature': temperature,
       'humidity': humidity,
-      'birthdate': birthdate.toIso8601String(), // Convert DateTime to ISO string
+      'birthdate': birthdate.toIso8601String(),
+      'foodScoope': foodScope,  
     };
   }
 }
 
 
-
 class LightSchedule {
   final bool scheduleNowEnabled;
-  final int scheduleTime; // int type for storing time as integer (1-24)
+  final int scheduleTime; 
 
   LightSchedule({
     required this.scheduleNowEnabled,
@@ -76,7 +79,7 @@ class LightSchedule {
   factory LightSchedule.fromMap(Map<dynamic, dynamic> map) {
     return LightSchedule(
       scheduleNowEnabled: map['scheduleNowEnabled'] ?? false,
-      scheduleTime: map['scheduleTime'] ?? 0, // Default to 0 if no value is present
+      scheduleTime: map['scheduleTime'] ?? 0, 
     );
   }
 

@@ -13,25 +13,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
     final petProvider = Provider.of<PetProvider>(context, listen: false);
-
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId = user.uid; // Get the user ID
-
-      // Fetch pet info using the userId
-      petProvider.fetchPetInfo(userId);
+      petProvider.fetchPetInfo(userId); // Fetch pet info
     }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
     final petProvider = Provider.of<PetProvider>(context);
     final petInfo = petProvider.petInfo;
-
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid;
 
     int calculateAge(DateTime birthdate) {
       final today = DateTime.now();
@@ -56,10 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               try {
                 await FirebaseAuth.instance.signOut(); // Sign out the user
-                // Optionally, navigate to the splash screen or login screen
                 Navigator.pushReplacementNamed(context, '/register');
               } catch (e) {
-                // Handle any errors that occur during logout
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Logout failed: ${e.toString()}')),
                 );
@@ -86,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(fontSize: 24, color: Colors.white),
                   ),
                   SizedBox(height: 10),
-                   Text(
+                  Text(
                     'Age: ${calculateAge(petInfo!.birthdate)} years',
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
@@ -100,21 +93,109 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Weight: ${petInfo?.weight ?? 'N/A'} kg',
                     style: TextStyle(fontSize: 18, color: Colors.white70),
                   ),
+                  SizedBox(height: 10),
+                  _buildFoodScoopSection(context, petProvider, userId!),
                   SizedBox(height: 30),
                   _buildOptionBox(context, Icons.cleaning_services,
-                      'Automatic Cleaning', '/automatic Cleaning'),
-                  _buildOptionBox(context, Icons.lightbulb, 'Llight sheduling',
-                      '/light sheduling'),
+                      'Automatic Cleaning', '/automaticCleaning'),
+                  _buildOptionBox(context, Icons.lightbulb, 'Light Scheduling',
+                      '/lightScheduling'),
                   _buildOptionBox(
-                      context, Icons.fastfood, 'Food Levels', '/food level'),
+                      context, Icons.fastfood, 'Food Levels', '/foodLevel'),
                   _buildOptionBox(context, Icons.thermostat,
-                      'Temperature and Humidity', '/temerature'),
-                  SizedBox(height: 30),
+                      'Temperature and Humidity', '/temperature'),
                 ],
               ),
             ),
     );
   }
+
+  Widget _buildFoodScoopSection(
+      BuildContext context, PetProvider petProvider, String userId) {
+    return Column(
+      children: [
+        Text(
+          'Food Scoop: ${petProvider.petInfo?.foodScope ?? 1}',
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+        SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () {
+            _showFoodScoopDialog(context, petProvider, userId);
+          },
+          child: Text("Edit Food Scoop"),
+        ),
+      ],
+    );
+  }
+
+void _showFoodScoopDialog(
+    BuildContext context, PetProvider petProvider, String userId) {
+  int tempFoodScoop = petProvider.petInfo?.foodScope ?? 1;
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Edit Food Scoop"),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: () {
+                    if (tempFoodScoop > 1) {
+                      setState(() {
+                        tempFoodScoop--;
+                      });
+                    }
+                  },
+                ),
+                Text(
+                  '$tempFoodScoop',
+                  style: TextStyle(fontSize: 18),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    if (tempFoodScoop < 5) {
+                      setState(() {
+                        tempFoodScoop++;
+                      });
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+            },
+            child: Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Update the food scoop
+              await petProvider.updateFoodScoop(userId, tempFoodScoop);
+
+              // Fetch updated pet info
+              await petProvider.fetchPetInfo(userId);
+
+              Navigator.pop(context); // Close dialog
+            },
+            child: Text("OK"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   Widget _buildOptionBox(
       BuildContext context, IconData icon, String title, String routeName) {

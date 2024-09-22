@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_care_app/model/user_model.dart';
 import 'package:pet_care_app/view/style.dart';
-import 'package:pet_care_app/view_model/auth_services.dart'; 
+import 'package:pet_care_app/view_model/auth_services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
@@ -24,8 +24,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isLoading = false;
 
-  String? petImagePath; 
+  String? petImagePath;
   String? petImageUrl;
+
+  int foodScoop = 1; // Initialize food scoop value
 
   final _formKey = GlobalKey<FormState>(); // For form validation
 
@@ -46,37 +48,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _pickPetImage() async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    type: FileType.image,
-  );
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
 
-  if (result != null) {
-    File file = File(result.files.single.path!); // Get the selected file
+    if (result != null) {
+      File file = File(result.files.single.path!); // Get the selected file
 
-    try {
-      // Create a unique file name using the current timestamp
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      
-      // Upload the file to Firebase Storage
-      TaskSnapshot snapshot = await FirebaseStorage.instance
-          .ref('pet_images/$fileName') // Specify the storage path
-          .putFile(file);
+      try {
+        // Create a unique file name using the current timestamp
+        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
 
-      // Get the download URL of the uploaded image
-      String downloadUrl = await snapshot.ref.getDownloadURL();
+        // Upload the file to Firebase Storage
+        TaskSnapshot snapshot = await FirebaseStorage.instance
+            .ref('pet_images/$fileName') // Specify the storage path
+            .putFile(file);
 
-      setState(() {
-        petImagePath = result.files.single.path; 
-        petImageUrl = downloadUrl; 
-      });
-    } catch (e) {
-     
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image upload failed: $e')),
-      );
+        // Get the download URL of the uploaded image
+        String downloadUrl = await snapshot.ref.getDownloadURL();
+
+        setState(() {
+          petImagePath = result.files.single.path;
+          petImageUrl = downloadUrl;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Image upload failed: $e')),
+        );
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +85,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Colors.grey[900], // Same dark background
       body: Center(
         child: SingleChildScrollView(
-          // Allows scrolling for smaller screens
           padding: EdgeInsets.all(30), // Padding around the screen content
           child: Form(
             key: _formKey, // Assign the form key
@@ -252,6 +252,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
 
+                // Food Scoop Increment and Decrement Buttons
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors
+                          .grey[850], // Background color for the container
+                      borderRadius:
+                          BorderRadius.circular(20), // Rounded corners
+                      border: Border.all(color: Colors.white), // Border color
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            "Food Scoop",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.remove, color: Colors.white),
+                              onPressed: () {
+                                setState(() {
+                                  if (foodScoop > 1)
+                                    foodScoop--; // Decrease scoop, min 1
+                                });
+                              },
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                foodScoop.toString(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.add, color: Colors.white),
+                              onPressed: () {
+                                setState(() {
+                                  if (foodScoop < 5)
+                                    foodScoop++; // Increase scoop, max 5
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 SizedBox(height: 30), // Space before button
 
                 // Create Account Button
@@ -261,6 +319,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       setState(() {
                         _isLoading = true; // Start loading
                       });
+
                       // Create LightSchedule and AutomaticCleaning objects
                       LightSchedule lightSchedule = LightSchedule(
                         scheduleNowEnabled: false,
@@ -272,28 +331,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         scheduleTime: 0,
                       );
 
-                        DateTime selectedDate = DateTime.parse(birthdateController.text);
+                      DateTime selectedDate =
+                          DateTime.parse(birthdateController.text);
                       PetInfo petInfo = PetInfo(
-                          petName: petNameController.text,
-                          imageUrl: petImageUrl.toString(),
-                       
-                          weight: weightController.text,
-                          height: heightController.text,
-                          lightSchedule: lightSchedule,
-                          automaticCleaning: automaticCleaning,
-                          temperature: 0.0,
-                          humidity: 0.0,
-                          birthdate: selectedDate);
+                        petName: petNameController.text,
+                        imageUrl: petImageUrl.toString(),
+                        weight: weightController.text,
+                        height: heightController.text,
+                        lightSchedule: lightSchedule,
+                        automaticCleaning: automaticCleaning,
+                        temperature: 0.0,
+                        humidity: 0.0,
+                        birthdate: selectedDate,
+                        foodScope: foodScoop, // Added foodScoop to petInfo
+                      );
 
                       User? user =
                           await _authService.registerWithEmailAndPassword(
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                        petInfo
-                      );
+                              emailController.text.trim(),
+                              passwordController.text.trim(),
+                              petInfo);
 
                       setState(() {
-                        _isLoading = false; // Stop loading
+                        _isLoading = false;
                       });
 
                       if (user != null) {
@@ -308,6 +368,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         );
                       }
                     },
+                    child: Text(
+                      'Create Account',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           AppColors.ThemeColor, // Orange color from style file
@@ -317,20 +384,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: Text(
-                      'Create Account',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
-                    ),
                   ),
                 ),
 
-                SizedBox(height: 20), // Space before login text
-
-                // Already have an account? Login here
-                Center(
+                 SizedBox(height: 20), 
+                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -344,14 +402,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(width: 5),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                              context, '/login'); // Navigate to login screen
+                           Navigator.pushNamed(context, '/login'); // Navigate to login screen
                         },
                         child: Text(
                           "Login here",
                           style: TextStyle(
-                            color:
-                                AppColors.ThemeColor, // Orange text for Login
+                            color: AppColors.ThemeColor, // Orange text for Login
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -359,7 +415,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
-                ),
+                )
               ],
             ),
           ),
@@ -368,18 +424,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Custom reusable method for creating text fields
+  // Reusable method for text fields
   Widget _buildTextField(
-    String label,
-    IconData icon,
-    TextEditingController controller,
-    bool isPassword,
-    TextInputType keyboardType,
-    bool isObscure,
-    String? Function(String?)? validator,
-  ) {
+      String labelText,
+      IconData icon,
+      TextEditingController controller,
+      bool obscureText,
+      TextInputType keyboardType,
+      bool autofocus,
+      String? Function(String?)? validator) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10), // Space between fields
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[850],
@@ -394,24 +449,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         child: TextFormField(
           controller: controller,
-          obscureText: isObscure, // If the field is for password, hide text
-          keyboardType: keyboardType, // Set the keyboard type
+          obscureText: obscureText,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
-            labelText: label,
-            labelStyle: TextStyle(color: Colors.white70), // Label text color
-            prefixIcon: Icon(icon, color: Colors.white70), // Icon color
+            labelText: labelText,
+            labelStyle: TextStyle(color: Colors.white70),
+            prefixIcon: Icon(icon, color: Colors.white70),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(color: Colors.white70),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide:
-                  BorderSide(color: AppColors.ThemeColor), // Focused color
+              borderSide: BorderSide(color: AppColors.ThemeColor),
             ),
           ),
-          style: TextStyle(color: Colors.white), // Text field input color
-          validator: validator, // Validation function
+          style: TextStyle(color: Colors.white),
+          validator: validator,
         ),
       ),
     );

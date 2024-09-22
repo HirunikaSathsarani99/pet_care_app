@@ -105,9 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
 
                         if (user != null) {
-                         // Use the actual user ID here
-                          final userProvider = Provider.of<UserProvider>(context, listen: false);
-  await userProvider.setUserId();
+                          // Use the actual user ID here
+                          final userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
+                          await userProvider.setUserId();
                           Navigator.pushNamed(context, '/home');
                         } else {
                           // Show error message

@@ -92,4 +92,18 @@ Future<void> setCleanLater(String userId, int scheduleTime) async {
     print('Error scheduling light: $e');
   }
 }
+
+   Future<void> updateFoodScoop(String userId, int foodScoop) async {
+    try {
+      DatabaseReference petInfoRef = FirebaseDatabase.instance.ref('Users/$userId/petInfo');
+      await petInfoRef.update({
+        'foodScoope': foodScoop,
+      });
+      notifyListeners();
+    } catch (e) {
+      print("Error updating food scoop: $e");
+    }
+  }
 }
+
+
